@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { GlobalSearchBox } from "../features/search";
 import { AccountSection } from "../components/ui/account-section";
 import { ContactSection } from "../components/ui/contact-section";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
@@ -19,12 +18,6 @@ export default function HomePage() {
 					<TabsTrigger value="accounts">Accounts</TabsTrigger>
 					<TabsTrigger value="contacts">Contacts</TabsTrigger>
 				</TabsList>
-				<div className="mt-4">
-					<GlobalSearchBox
-						placeholder={`Search ${activeTab}...`}
-						scope={activeTab}
-					/>
-				</div>
 				<TabsContent value="accounts" className="mt-4">
 					<AccountSection />
 				</TabsContent>

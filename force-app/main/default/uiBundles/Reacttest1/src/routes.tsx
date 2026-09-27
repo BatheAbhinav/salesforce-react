@@ -36,11 +36,6 @@ export const routes: RouteObject[] = [
         handle: { showInNavigation: true, label: "Home" }
       },
       {
-        path: "search",
-        element: <SearchPage />,
-        handle: { showInNavigation: true, label: "Search" }
-      },
-      {
         path: "accounts/:recordId",
         element: <AccountObjectDetail />
       },
