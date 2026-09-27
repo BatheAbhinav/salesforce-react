@@ -1,0 +1,35 @@
+query GetContacts($first: Int, $after: String) {
+	uiapi {
+		query {
+			Contact(first: $first, after: $after, orderBy: { LastName: { order: ASC } }) {
+				edges {
+					node {
+						Id
+						Name @optional {
+							value
+							displayValue
+						}
+						Email @optional {
+							value
+							displayValue
+						}
+						Phone @optional {
+							value
+							displayValue
+						}
+						Account @optional {
+							Name @optional {
+								value
+								displayValue
+							}
+						}
+					}
+				}
+				pageInfo {
+					hasNextPage
+					endCursor
+				}
+			}
+		}
+	}
+}

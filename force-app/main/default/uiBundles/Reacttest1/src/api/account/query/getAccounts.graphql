@@ -1,0 +1,33 @@
+query GetAccounts($first: Int, $after: String) {
+	uiapi {
+		query {
+			Account(first: $first, after: $after, orderBy: { Name: { order: ASC } }) {
+				edges {
+					node {
+						Id
+						Name @optional {
+							value
+							displayValue
+						}
+						Phone @optional {
+							value
+							displayValue
+						}
+						Industry @optional {
+							value
+							displayValue
+						}
+						Type @optional {
+							value
+							displayValue
+						}
+					}
+				}
+				pageInfo {
+					hasNextPage
+					endCursor
+				}
+			}
+		}
+	}
+}

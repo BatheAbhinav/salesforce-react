@@ -1,0 +1,9 @@
+{
+  "permsetAssignments": {
+    "assignments": {
+      "Reacttest1_Access": {
+        "assignee": "currentUser"
+      }
+    }
+  }
+}
