@@ -2,6 +2,7 @@ import { useState } from "react";
 import { AccountSection } from "../components/ui/account-section";
 import { ContactSection } from "../components/ui/contact-section";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
+import { OpportunitySection } from "@/components/ui/opportunities.section";
 
 export default function HomePage() {
 	const [activeTab, setActiveTab] = useState("accounts");
@@ -17,9 +18,13 @@ export default function HomePage() {
 				<TabsList aria-label="Salesforce object type">
 					<TabsTrigger value="accounts">Accounts</TabsTrigger>
 					<TabsTrigger value="contacts">Contacts</TabsTrigger>
+					<TabsTrigger value="opportunities">Opportunities</TabsTrigger>
 				</TabsList>
 				<TabsContent value="accounts" className="mt-4">
 					<AccountSection />
+				</TabsContent>
+				<TabsContent value="opportunities" className="mt-4">
+					<OpportunitySection />
 				</TabsContent>
 				<TabsContent value="contacts" className="mt-4">
 					<ContactSection />

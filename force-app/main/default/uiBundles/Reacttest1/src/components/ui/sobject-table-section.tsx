@@ -1,7 +1,11 @@
 import * as React from 'react';
 import { Search } from 'lucide-react';
 
-import { querySObject, type SObjectField, type SObjectRecord } from '../../api/sobject/querySObject';
+import {
+  querySObject,
+  type SObjectField,
+  type SObjectRecord,
+} from '../../api/sobject/querySObject';
 import { useAsyncData } from '../../features/search/hooks/useAsyncData';
 import { DataTableSection, type ColumnDef } from './data-table-section';
 import { Input } from './input';
@@ -42,22 +46,26 @@ function SObjectTableSection({
     [object, fields, filters, orderBy]
   );
 
+  console.log('SObjectTableSection data:', data);
+
   const [search, setSearch] = React.useState('');
 
   const selectedColumns: SObjectColumn[] =
     columns ?? fields.map((field): SObjectColumn => ({ field }));
-  const tableColumns: ColumnDef<SObjectRecord>[] = selectedColumns.map((column) => ({
+  const tableColumns: ColumnDef<SObjectRecord>[] = selectedColumns.map(
+    column => ({
       key: column.field,
       header: column.header ?? toHeader(column.field),
       className: column.className,
-      cell: (row) => formatValue(row[column.field]),
-    }));
+      cell: row => formatValue(row[column.field]),
+    })
+  );
 
   const filteredData = React.useMemo(() => {
     const term = search.trim().toLowerCase();
     if (!term) return data ?? [];
-    return (data ?? []).filter((row) =>
-      selectedColumns.some((column) => {
+    return (data ?? []).filter(row =>
+      selectedColumns.some(column => {
         const value = row[column.field];
         return value != null && String(value).toLowerCase().includes(term);
       })
@@ -65,7 +73,11 @@ function SObjectTableSection({
   }, [data, search, selectedColumns]);
 
   if (error) {
-    return <p className="text-sm text-destructive">Failed to load {title.toLowerCase()}: {error}</p>;
+    return (
+      <p className="text-sm text-destructive">
+        Failed to load {title.toLowerCase()}: {error}
+      </p>
+    );
   }
 
   return (
@@ -78,7 +90,7 @@ function SObjectTableSection({
         <Input
           type="search"
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={e => setSearch(e.target.value)}
           placeholder={`Search ${title.toLowerCase()}...`}
           aria-label={`Search ${title}`}
           className="pl-9"
@@ -91,9 +103,11 @@ function SObjectTableSection({
         data={filteredData}
         pageSize={10}
         isLoading={loading}
-        getRowId={(row) => row.Id}
+        getRowId={row => row.Id}
         emptyMessage={
-          search.trim() ? `No ${title.toLowerCase()} match “${search.trim()}”.` : emptyMessage
+          search.trim()
+            ? `No ${title.toLowerCase()} match “${search.trim()}”.`
+            : emptyMessage
         }
       />
     </div>
