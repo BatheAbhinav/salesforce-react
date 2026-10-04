@@ -1,3 +1,4 @@
+import { createDataSDK } from '@salesforce/platform-sdk';
 export class ApexClient {
   private baseUrl: string;
   private accessToken: string;
@@ -7,28 +8,41 @@ export class ApexClient {
     this.accessToken = import.meta.env.VITE_SFDC_ACCESS_TOKEN || '';
   }
 
-  async callApexMethod<T>(
-    endPoint: string,
-    params?: Record<string, unknown>
-  ): Promise<T> {
+  async callApexMethod<T>(endPoint: string): Promise<T> {
+    console.log('4th October Log');
     if (!this.baseUrl || !this.accessToken) {
       throw new Error(
         'Base URL or Access Token is not defined in environment variables.'
       );
     }
 
-    const url = `${this.baseUrl}/apex/${endPoint}`;
-    console.log(`DEBUG: ${url}`);
-    console.log(`DEBUG token: ${this.accessToken}`);
+    let url: string;
+    url = `${this.baseUrl}/${endPoint}`;
+    console.log('Calling Apex method at URL:', url);
+
     let response;
     try {
-      response = await fetch(url, {
+      // response = await fetch(url, {
+      //   method: 'GET',
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //     Authorization: `Bearer ${this.accessToken}`,
+      //     credentials: 'include',
+      //   },
+      //   body: JSON.stringify(params),
+      // });
+
+      const dataSdk = await createDataSDK();
+      if (!dataSdk.fetch) {
+        throw new Error('DataSDK fetch method is not available.');
+      }
+
+      response = await dataSdk.fetch(`/services/apexrest/${endPoint}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${this.accessToken}`,
+          // Authorization: `Bearer ${this.accessToken}`,
         },
-        body: JSON.stringify(params),
       });
     } catch (error) {
       console.error('Error calling Apex method:', error);
