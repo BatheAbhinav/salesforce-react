@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { ColumnDef, DataTableSection } from './data-table-section';
+import { ApexClient } from '@/utils/apexClient';
 // import { createDataSDK } from '@salesforce/platform-sdk';
 
 type Opportunity = {
@@ -15,47 +16,7 @@ function OpportunitySection() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const [search, setSearch] = useState('');
-
-  const baseUrl = import.meta.env.VITE_SFDC_BASE_URL;
-  const accessToken = import.meta.env.VITE_SFDC_ACCESS_TOKEN;
-
-  const url = `${baseUrl}/opportunities`;
-  const token = `${accessToken}`;
-
-  useEffect(() => {
-    const controller = new AbortController();
-
-    async function load() {
-      try {
-        const response = await fetch(url, {
-          method: 'GET',
-          headers: {
-            Authorization: token,
-            'Content-Type': 'application/json',
-          },
-          signal: controller.signal,
-        });
-
-        if (!response.ok) {
-          throw new Error(`Request failed: ${response.status}`);
-        }
-
-        const json = await response.json();
-        console.log('Fetched opportunities data:', json);
-        setData(json);
-      } catch (err) {
-        if ((err as Error).name === 'AbortError') return;
-        console.error(err);
-        setError((err as Error).message);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    load();
-    return () => controller.abort();
-  }, []);
+  const apexClient = new ApexClient();
 
   const columns: ColumnDef<Opportunity>[] = [
     { key: 'Name', header: 'Opportunity Name', cell: row => row.Name },
@@ -67,6 +28,22 @@ function OpportunitySection() {
     { key: 'StageName', header: 'Stage', cell: row => row.StageName },
     { key: 'CloseDate', header: 'Close Date', cell: row => row.CloseDate },
   ];
+
+  useEffect(() => {
+    apexClient
+      .callApexMethod<Opportunity[]>('opportunities')
+      .then(data => {
+        console.log('Fetched opportunities data:', data);
+        setData(data);
+      })
+      .catch(err => {
+        console.error('Error fetching opportunities:', err);
+        setError(err.message);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, []);
 
   if (loading) return <div>Loading opportunities...</div>;
   if (error) return <div>Error: {error}</div>;
