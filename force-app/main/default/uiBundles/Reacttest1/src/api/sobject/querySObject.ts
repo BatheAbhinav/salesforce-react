@@ -35,11 +35,11 @@ function assertIdentifier(value: string, label: string): void {
 
 function buildQuery({ object, fields }: SObjectQueryOptions): string {
   assertIdentifier(object, 'object name');
-  fields.forEach((field) => assertIdentifier(field, 'field name'));
+  fields.forEach(field => assertIdentifier(field, 'field name'));
 
   const selections = fields
-    .filter((field) => field !== 'Id')
-    .map((field) => `${field} @optional { value displayValue }`);
+    .filter(field => field !== 'Id')
+    .map(field => `${field} @optional { value displayValue }`);
 
   return `query QuerySObject($first: Int, $after: String, $where: ${object}_Filter, $orderBy: ${object}_OrderBy) {
 	uiapi {
@@ -65,7 +65,10 @@ export async function querySObject(
   }
 
   const data = await createDataSDK();
-  const result = await data.graphql!.query<QueryResponse, Record<string, unknown>>({
+  const result = await data.graphql!.query<
+    QueryResponse,
+    Record<string, unknown>
+  >({
     query: buildQuery(options),
     variables: {
       first: options.first ?? 200,
@@ -73,15 +76,19 @@ export async function querySObject(
       where: options.filters ?? null,
       orderBy: options.orderBy ?? null,
     },
+    cacheControl: {
+      maxAge: 15,
+      type: 'max-age',
+    },
   });
 
   if (result.errors?.length) {
-    throw new Error(result.errors.map((error) => error.message).join('; '));
+    throw new Error(result.errors.map(error => error.message).join('; '));
   }
 
   return (result.data?.uiapi?.query?.[options.object]?.edges ?? [])
-    .flatMap((edge) => (edge?.node ? [edge.node] : []))
-    .map((node) => normalizeRecord(node, options.fields))
+    .flatMap(edge => (edge?.node ? [edge.node] : []))
+    .map(node => normalizeRecord(node, options.fields))
     .filter((record): record is SObjectRecord => record.Id.length > 0);
 }
 
@@ -92,8 +99,8 @@ function normalizeRecord(
   const record: SObjectRecord = { Id: String(node.Id ?? '') };
 
   fields
-    .filter((field) => field !== 'Id')
-    .forEach((field) => {
+    .filter(field => field !== 'Id')
+    .forEach(field => {
       const value = node[field];
       if (value && typeof value === 'object' && 'displayValue' in value) {
         const fieldValue = value as { value?: unknown; displayValue?: unknown };

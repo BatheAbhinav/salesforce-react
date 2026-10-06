@@ -43,6 +43,7 @@ export class ApexClient {
           'Content-Type': 'application/json',
           // Authorization: `Bearer ${this.accessToken}`,
         },
+        cache: 'default',
       });
     } catch (error) {
       console.error('Error calling Apex method:', error);
