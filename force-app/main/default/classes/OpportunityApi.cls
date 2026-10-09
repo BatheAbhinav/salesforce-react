@@ -2,11 +2,11 @@
 global with sharing class OpportunityApi {
   @HttpGet
   global static List<Opportunity> getOpportunities() {
+    //add relations
     List<Opportunity> opportunities = [
-      SELECT Id, Name, Amount, StageName, CloseDate
+      SELECT Id, Name, Amount, StageName, CloseDate, Account.Name, Account.Industry, Account.AnnualRevenue
       FROM Opportunity
-      WITH USER_MODE
-      LIMIT 200
+      LIMIT 5
     ];
     return opportunities;
   }
