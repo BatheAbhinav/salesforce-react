@@ -15,6 +15,7 @@ type Opportunity = {
   Amount: number;
   StageName: string;
   CloseDate: string;
+  Account: any;
   field?: SObjectField;
 };
 
@@ -29,6 +30,7 @@ const columns: ColumnDef<Opportunity>[] = [
   },
   { key: 'StageName', header: 'Stage', cell: row => row.StageName },
   { key: 'CloseDate', header: 'Close Date', cell: row => row.CloseDate },
+  { key: 'Account', header: 'Account', cell: row => row.Account.Name },
 ];
 
 function OpportunitySection() {
