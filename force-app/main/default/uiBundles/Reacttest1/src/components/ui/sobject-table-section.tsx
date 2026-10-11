@@ -23,6 +23,8 @@ export type SObjectTableSectionProps = {
   columns?: SObjectColumn[];
   emptyMessage?: string;
   method: 'graphql' | 'rest';
+  enableSearch?: boolean;
+  enablePagination?: boolean;
 };
 
 function toHeader(field: string): string {
@@ -39,10 +41,12 @@ function SObjectTableSection({
   columns,
   emptyMessage,
   method,
+  enableSearch = true,
+  enablePagination = true,
 }: SObjectTableSectionProps) {
   const { data, loading, error } = useAsyncData(
     () => querySObject({ object, fields, filters, orderBy, method }),
-    [object, fields, filters, orderBy]
+    [object, fields, filters, orderBy, method]
   );
 
   console.log('SObjectTableSection data:', data);
@@ -60,8 +64,10 @@ function SObjectTableSection({
     })
   );
 
+  const searchTerm = enableSearch ? search.trim() : '';
+
   const filteredData = React.useMemo(() => {
-    const term = search.trim().toLowerCase();
+    const term = searchTerm.toLowerCase();
     if (!term) return data ?? [];
     return (data ?? []).filter(row =>
       selectedColumns.some(column => {
@@ -69,7 +75,7 @@ function SObjectTableSection({
         return value != null && String(value).toLowerCase().includes(term);
       })
     );
-  }, [data, search, selectedColumns]);
+  }, [data, searchTerm, selectedColumns]);
 
   if (error) {
     return (
@@ -81,20 +87,22 @@ function SObjectTableSection({
 
   return (
     <div className="space-y-4">
-      <div className="relative max-w-sm">
-        <Search
-          aria-hidden="true"
-          className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground"
-        />
-        <Input
-          type="search"
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          placeholder={`Search ${title.toLowerCase()}...`}
-          aria-label={`Search ${title}`}
-          className="pl-9"
-        />
-      </div>
+      {enableSearch && (
+        <div className="relative max-w-sm">
+          <Search
+            aria-hidden="true"
+            className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground"
+          />
+          <Input
+            type="search"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder={`Search ${title.toLowerCase()}...`}
+            aria-label={`Search ${title}`}
+            className="pl-9"
+          />
+        </div>
+      )}
       <DataTableSection
         title={title}
         description={description}
@@ -104,8 +112,8 @@ function SObjectTableSection({
         isLoading={loading}
         getRowId={row => row.Id}
         emptyMessage={
-          search.trim()
-            ? `No ${title.toLowerCase()} match “${search.trim()}”.`
+          searchTerm
+            ? `No ${title.toLowerCase()} match “${searchTerm}”.`
             : emptyMessage
         }
       />

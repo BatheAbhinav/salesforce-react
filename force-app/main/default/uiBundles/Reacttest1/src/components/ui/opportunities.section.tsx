@@ -67,9 +67,14 @@ function OpportunitySection({ dateFormat = 'yyyy-mm-dd' }: OpportunitySectionPro
   useEffect(() => {
     apexClient
       .callApexMethod<Opportunity[]>('opportunities')
-      .then(data => {
-        console.log('Fetched opportunities data:', data);
-        setData(data);
+      .then(response => {
+        if (response.errors?.length) {
+          throw new Error(response.errors.map(item => item.message).join('; '));
+        }
+        if (!Array.isArray(response.data)) {
+          throw new Error('The opportunities response was not a list.');
+        }
+        setData(response.data);
       })
       .catch(err => {
         console.error('Error fetching opportunities:', err);

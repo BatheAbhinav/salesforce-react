@@ -1,6 +1,6 @@
 import { SObjectTableSection } from './sobject-table-section';
 
-function ContactSection() {
+function ContactSection({enableSearch = true, enablePagination = true}) {
   return (
     <SObjectTableSection
       title="Contacts"
@@ -9,6 +9,8 @@ function ContactSection() {
       orderBy={{ LastName: { order: 'ASC' } }}
       emptyMessage="No contacts found."
       method="rest"
+      enableSearch={enableSearch}
+      enablePagination={enablePagination}
     />
   );
 }

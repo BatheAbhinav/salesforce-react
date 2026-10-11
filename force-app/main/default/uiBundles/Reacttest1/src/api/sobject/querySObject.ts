@@ -1,4 +1,4 @@
-import { ApexClient, ApexResponse } from '@/utils/apexClient';
+import { ApexClient } from '@/utils/apexClient';
 import { executeGraphQL } from '../graphqlClient';
 import { QueryResponse, SObjectQueryOptions, SObjectRecord } from '@/lib/types';
 
@@ -42,7 +42,10 @@ export async function querySObject(
   }
 
   if (options.method === 'rest') {
-    const result = await apexClient.callApexMethod<ApexResponse>(`accounts`);
+    const endpoint = `${options.object.toLowerCase()}s`;
+    const result = await apexClient.callApexMethod<
+      Array<Record<string, unknown>>
+    >(endpoint);
     if (result.errors?.length) {
       throw new Error(result.errors.map(error => error.message).join('; '));
     }

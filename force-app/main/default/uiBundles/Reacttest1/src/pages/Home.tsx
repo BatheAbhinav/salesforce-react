@@ -20,7 +20,7 @@ export default function HomePage() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <h1 className="text-2xl font-bold mb-6">Accounts and contacts</h1>
+      <h1 className="text-2xl font-bold mb-6">Home</h1>
       <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-6">
         <TabsList aria-label="Salesforce object type">
           <TabsTrigger value="Home">Home</TabsTrigger>
@@ -29,7 +29,11 @@ export default function HomePage() {
           <TabsTrigger value="opportunities">Opportunities</TabsTrigger>
         </TabsList>
         <TabsContent value="Home" className="mt-4">
-          <div />
+          <>
+            <AccountSection enableSearch={false} />
+            <ContactSection enableSearch={false} />
+            <OpportunitySection />
+          </>
         </TabsContent>
         <TabsContent value="accounts" className="mt-4">
           <AccountSection />

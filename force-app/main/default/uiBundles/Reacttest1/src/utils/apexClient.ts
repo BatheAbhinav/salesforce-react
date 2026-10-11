@@ -1,7 +1,7 @@
 import { createDataSDK } from '@salesforce/platform-sdk';
 
-export type ApexResponse = {
-  data: Array<Record<string, unknown>>;
+export type ApexResponse<T = Array<Record<string, unknown>>> = {
+  data: T;
   errors?: Array<{ message: string }>;
 };
 
@@ -14,7 +14,7 @@ export class ApexClient {
     this.accessToken = import.meta.env.VITE_SFDC_ACCESS_TOKEN || '';
   }
 
-  async callApexMethod<ApexResponse>(endPoint: string): Promise<ApexResponse> {
+  async callApexMethod<T>(endPoint: string): Promise<ApexResponse<T>> {
     console.log('4th October Log');
     if (!this.baseUrl || !this.accessToken) {
       throw new Error(
@@ -22,21 +22,8 @@ export class ApexClient {
       );
     }
 
-    let url: string;
-    url = `${this.baseUrl}/${endPoint}`;
-    console.log('Calling Apex method at URL:', url);
-
     let response;
     try {
-      // response = await fetch(url, {
-      //   method: 'GET',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //     Authorization: `Bearer ${this.accessToken}`,
-      //     credentials: 'include',
-      //   },
-      //   body: JSON.stringify(params),
-      // });
 
       const dataSdk = await createDataSDK();
       if (!dataSdk.fetch) {
@@ -47,7 +34,6 @@ export class ApexClient {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          // Authorization: `Bearer ${this.accessToken}`,
         },
         cache: 'default',
       });
@@ -65,6 +51,6 @@ export class ApexClient {
     return {
       data: await response.json(),
       errors: response.ok ? undefined : [{ message: response.statusText }],
-    } as ApexResponse;
+    } as ApexResponse<T>;
   }
 }
