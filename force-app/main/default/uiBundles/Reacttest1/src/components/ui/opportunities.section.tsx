@@ -19,25 +19,50 @@ type Opportunity = {
   field?: SObjectField;
 };
 
+export type DateFormat = 'yyyy-mm-dd' | 'dd-mm-yyyy';
+
 const apexClient = new ApexClient();
 
-const columns: ColumnDef<Opportunity>[] = [
-  { key: 'Name', header: 'Opportunity Name', cell: row => row.Name },
-  {
-    key: 'Amount',
-    header: 'Amount',
-    cell: row => `$${row.Amount.toLocaleString()}`,
-  },
-  { key: 'StageName', header: 'Stage', cell: row => row.StageName },
-  { key: 'CloseDate', header: 'Close Date', cell: row => row.CloseDate },
-  { key: 'Account', header: 'Account', cell: row => row.Account.Name },
-];
+function formatCloseDate(closeDate: string, dateFormat: DateFormat): string {
+  const [year, month, day] = closeDate.split('-');
+  if (!year || !month || !day) return closeDate;
+  return dateFormat === 'dd-mm-yyyy'
+    ? `${day}-${month}-${year}`
+    : `${year}-${month}-${day}`;
+}
 
-function OpportunitySection() {
+export function toggleDateFormat(dateFormat: DateFormat): DateFormat {
+  return dateFormat === 'yyyy-mm-dd' ? 'dd-mm-yyyy' : 'yyyy-mm-dd';
+}
+
+type OpportunitySectionProps = {
+  dateFormat?: DateFormat;
+};
+
+function OpportunitySection({ dateFormat = 'yyyy-mm-dd' }: OpportunitySectionProps) {
   const [data, setData] = useState<Opportunity[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
+
+  const columns: ColumnDef<Opportunity>[] = React.useMemo(
+    () => [
+      { key: 'Name', header: 'Opportunity Name', cell: row => row.Name },
+      {
+        key: 'Amount',
+        header: 'Amount',
+        cell: row => `$${row.Amount.toLocaleString()}`,
+      },
+      { key: 'StageName', header: 'Stage', cell: row => row.StageName },
+      {
+        key: 'CloseDate',
+        header: 'Close Date',
+        cell: row => formatCloseDate(row.CloseDate, dateFormat),
+      },
+      { key: 'Account', header: 'Account', cell: row => row.Account.Name },
+    ],
+    [dateFormat]
+  );
 
   useEffect(() => {
     apexClient
@@ -64,7 +89,7 @@ function OpportunitySection() {
         return value != null && String(value).toLowerCase().includes(term);
       })
     );
-  }, [data, search]);
+  }, [data, search, columns]);
 
   if (loading) return <div>Loading opportunities...</div>;
   if (error) return <div>Error: {error}</div>;

@@ -7,10 +7,16 @@ import {
   TabsList,
   TabsTrigger,
 } from '../components/ui/tabs';
-import { OpportunitySection } from '@/components/ui/opportunities.section';
+import {
+  DateFormat,
+  OpportunitySection,
+  toggleDateFormat,
+} from '@/components/ui/opportunities.section';
+import { Button } from '@/components/ui';
 
 export default function HomePage() {
   const [activeTab, setActiveTab] = useState('accounts');
+  const [dateFormat, setDateFormat] = useState<DateFormat>('yyyy-mm-dd');
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -29,7 +35,10 @@ export default function HomePage() {
           <AccountSection />
         </TabsContent>
         <TabsContent value="opportunities" className="mt-4">
-          <OpportunitySection />
+          <Button onClick={() => setDateFormat(toggleDateFormat)}>
+            Change date format
+          </Button>
+          <OpportunitySection dateFormat={dateFormat} />
         </TabsContent>
         <TabsContent value="contacts" className="mt-4">
           <ContactSection />
