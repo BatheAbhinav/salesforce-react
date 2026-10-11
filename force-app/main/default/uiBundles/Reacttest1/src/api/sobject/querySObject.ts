@@ -18,7 +18,7 @@ function buildQuery({ object, fields }: SObjectQueryOptions): string {
     .filter(field => field !== 'Id')
     .map(field => `${field} @optional { value displayValue }`);
 
-  return `  QuerySObject($first: Int, $after: String, $where: ${object}_Filter, $orderBy: ${object}_OrderBy) {
+  return `query QuerySObject($first: Int, $after: String, $where: ${object}_Filter, $orderBy: ${object}_OrderBy) {
 	uiapi {
 		query {
 			${object}(first: $first, after: $after, where: $where, orderBy: $orderBy) {

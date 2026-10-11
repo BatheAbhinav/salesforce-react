@@ -8,6 +8,7 @@ function ContactSection() {
       fields={['Name', 'Email', 'Phone']}
       orderBy={{ LastName: { order: 'ASC' } }}
       emptyMessage="No contacts found."
+      method="rest"
     />
   );
 }
