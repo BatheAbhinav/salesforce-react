@@ -15,7 +15,7 @@ import {
 import { Button } from '@/components/ui';
 
 export default function HomePage() {
-  const [activeTab, setActiveTab] = useState('accounts');
+  const [activeTab, setActiveTab] = useState('Home');
   const [dateFormat, setDateFormat] = useState<DateFormat>('yyyy-mm-dd');
 
   return (
