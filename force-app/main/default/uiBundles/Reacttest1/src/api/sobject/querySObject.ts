@@ -10,6 +10,12 @@ function assertIdentifier(value: string, label: string): void {
   }
 }
 
+function pluralize(object: string): string {
+  return /[^aeiou]y$/i.test(object)
+    ? `${object.slice(0, -1)}ies`
+    : `${object}s`;
+}
+
 function buildQuery({ object, fields }: SObjectQueryOptions): string {
   assertIdentifier(object, 'object name');
   fields.forEach(field => assertIdentifier(field, 'field name'));
@@ -42,7 +48,7 @@ export async function querySObject(
   }
 
   if (options.method === 'rest') {
-    const endpoint = `${options.object.toLowerCase()}s`;
+    const endpoint = pluralize(options.object.toLowerCase());
     const result = await apexClient.callApexMethod<
       Array<Record<string, unknown>>
     >(endpoint);

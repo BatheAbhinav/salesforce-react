@@ -32,7 +32,7 @@ export default function HomePage() {
           <>
             <AccountSection enableSearch={false} enablePagination={false} />
             <ContactSection enableSearch={false} enablePagination={false} />
-            <OpportunitySection enablePagination={false} />
+            <OpportunitySection enableSearch={false} enablePagination={false} />
           </>
         </TabsContent>
         <TabsContent value="accounts" className="mt-4">

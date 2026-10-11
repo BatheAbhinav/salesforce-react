@@ -11,6 +11,7 @@ export type SObjectColumn = {
   field: SObjectField;
   header?: string;
   className?: string;
+  cell?: (row: SObjectRecord) => React.ReactNode;
 };
 
 export type SObjectTableSectionProps = {
@@ -60,7 +61,7 @@ function SObjectTableSection({
       key: column.field,
       header: column.header ?? toHeader(column.field),
       className: column.className,
-      cell: row => formatValue(row[column.field]),
+      cell: row => column.cell ? column.cell(row) : formatValue(row[column.field]),
     })
   );
 
@@ -109,7 +110,7 @@ function SObjectTableSection({
         columns={tableColumns}
         data={filteredData}
         pageSize={enablePagination ? 10 : 5}
-        showPageSizeSelector={enablePagination}
+        enablePagination={enablePagination}
         isLoading={loading}
         getRowId={row => row.Id}
         emptyMessage={

@@ -33,7 +33,7 @@ export type DataTableSectionProps<T> = {
   data: T[];
   pageSize?: number;
   pageSizeOptions?: number[];
-  showPageSizeSelector?: boolean;
+  enablePagination?: boolean;
   getRowId: (row: T) => string | number;
   emptyMessage?: string;
   isLoading?: boolean;
@@ -53,7 +53,7 @@ function DataTableSection<T>({
   data,
   pageSize = 10,
   pageSizeOptions = [10, 25, 50],
-  showPageSizeSelector = true,
+  enablePagination = true,
   getRowId,
   emptyMessage = 'No results.',
   isLoading = false,
@@ -84,7 +84,7 @@ function DataTableSection<T>({
           ) : null}
         </div>
 
-        {showPageSizeSelector ? (
+        {enablePagination ? (
           <label className="flex items-center gap-2 text-sm text-muted-foreground">
             Rows per page
             <select
@@ -149,7 +149,7 @@ function DataTableSection<T>({
         </TableBody>
       </Table>
 
-      {pageCount > 1 ? (
+      {enablePagination && pageCount > 1 ? (
         <div className="flex items-center justify-between gap-4">
           <p className="text-sm text-muted-foreground">
             Page {page} of {pageCount} &middot; {data.length} results
