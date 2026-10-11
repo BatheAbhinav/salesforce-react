@@ -21,14 +21,18 @@ export async function executeGraphQL<TData, TVariables>(
   variables?: TVariables
 ): Promise<TData> {
   const data = await createDataSDK();
+  if (!data.graphql) {
+    throw new Error('GraphQL is not supported in this environment.');
+  }
+
   const result = isMutation(operation)
-    ? await data.graphql!.mutate<TData, TVariables>({
+    ? await data.graphql.mutate<TData, TVariables>({
         mutation: operation,
-        variables: variables,
+        variables,
       })
-    : await data.graphql!.query<TData, TVariables>({
+    : await data.graphql.query<TData, TVariables>({
         query: operation,
-        variables: variables,
+        variables,
       });
 
   if (result.errors?.length) {
@@ -37,7 +41,7 @@ export async function executeGraphQL<TData, TVariables>(
   }
 
   if (result.data == null) {
-    throw new Error('GraphQL response data is null');
+    throw new Error('GraphQL response data is empty.');
   }
 
   return result.data;

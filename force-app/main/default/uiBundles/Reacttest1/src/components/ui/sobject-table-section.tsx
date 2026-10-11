@@ -1,11 +1,8 @@
 import * as React from 'react';
 import { Search } from 'lucide-react';
 
-import {
-  querySObject,
-  type SObjectField,
-  type SObjectRecord,
-} from '../../api/sobject/querySObject';
+import { type SObjectField, type SObjectRecord } from '../../lib/types';
+import { querySObject } from '@/api/sobject/querySObject'; //fix import!!
 import { useAsyncData } from '../../features/search/hooks/useAsyncData';
 import { DataTableSection, type ColumnDef } from './data-table-section';
 import { Input } from './input';
@@ -25,6 +22,7 @@ export type SObjectTableSectionProps = {
   orderBy?: Record<string, unknown>;
   columns?: SObjectColumn[];
   emptyMessage?: string;
+  method: 'graphql' | 'rest';
 };
 
 function toHeader(field: string): string {
@@ -40,9 +38,10 @@ function SObjectTableSection({
   orderBy,
   columns,
   emptyMessage,
+  method,
 }: SObjectTableSectionProps) {
   const { data, loading, error } = useAsyncData(
-    () => querySObject({ object, fields, filters, orderBy }),
+    () => querySObject({ object, fields, filters, orderBy, method }),
     [object, fields, filters, orderBy]
   );
 

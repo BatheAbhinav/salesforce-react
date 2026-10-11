@@ -1,4 +1,10 @@
 import { createDataSDK } from '@salesforce/platform-sdk';
+
+export type ApexResponse = {
+  data: Array<Record<string, unknown>>;
+  errors?: Array<{ message: string }>;
+};
+
 export class ApexClient {
   private baseUrl: string;
   private accessToken: string;
@@ -8,7 +14,7 @@ export class ApexClient {
     this.accessToken = import.meta.env.VITE_SFDC_ACCESS_TOKEN || '';
   }
 
-  async callApexMethod<T>(endPoint: string): Promise<T> {
+  async callApexMethod<ApexResponse>(endPoint: string): Promise<ApexResponse> {
     console.log('4th October Log');
     if (!this.baseUrl || !this.accessToken) {
       throw new Error(
@@ -56,6 +62,9 @@ export class ApexClient {
       );
     }
 
-    return await response.json();
+    return {
+      data: await response.json(),
+      errors: response.ok ? undefined : [{ message: response.statusText }],
+    } as ApexResponse;
   }
 }

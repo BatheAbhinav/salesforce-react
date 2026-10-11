@@ -11,6 +11,7 @@ function AccountSection() {
       fields={ACCOUNT_FIELDS}
       orderBy={ACCOUNT_ORDER_BY}
       emptyMessage="No accounts found."
+      method="graphql"
     />
   );
 }

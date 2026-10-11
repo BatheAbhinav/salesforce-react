@@ -6,7 +6,7 @@ import { title } from 'process';
 import { Search } from 'lucide-react';
 import React from 'react';
 // import { SObjectColumn } from './sobject-table-section';
-import { SObjectField } from '@/api/sobject/querySObject';
+import { SObjectField } from '../../lib/types/graphql.types';
 // import { createDataSDK } from '@salesforce/platform-sdk';
 
 type Opportunity = {
