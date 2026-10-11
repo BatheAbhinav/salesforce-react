@@ -30,9 +30,9 @@ export default function HomePage() {
         </TabsList>
         <TabsContent value="Home" className="mt-4">
           <>
-            <AccountSection enableSearch={false} />
-            <ContactSection enableSearch={false} />
-            <OpportunitySection />
+            <AccountSection enableSearch={false} enablePagination={false} />
+            <ContactSection enableSearch={false} enablePagination={false} />
+            <OpportunitySection enablePagination={false} />
           </>
         </TabsContent>
         <TabsContent value="accounts" className="mt-4">

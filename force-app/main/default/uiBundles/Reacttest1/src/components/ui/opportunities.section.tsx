@@ -37,9 +37,13 @@ export function toggleDateFormat(dateFormat: DateFormat): DateFormat {
 
 type OpportunitySectionProps = {
   dateFormat?: DateFormat;
+  enablePagination?: boolean;
 };
 
-function OpportunitySection({ dateFormat = 'yyyy-mm-dd' }: OpportunitySectionProps) {
+function OpportunitySection({
+  dateFormat = 'yyyy-mm-dd',
+  enablePagination = true,
+}: OpportunitySectionProps) {
   const [data, setData] = useState<Opportunity[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -119,6 +123,8 @@ function OpportunitySection({ dateFormat = 'yyyy-mm-dd' }: OpportunitySectionPro
         title="Opportunities"
         columns={columns}
         data={filteredData}
+        pageSize={enablePagination ? 10 : 5}
+        showPageSizeSelector={enablePagination}
         getRowId={row => row.Id}
         emptyMessage="No opportunities found."
       />

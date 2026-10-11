@@ -108,7 +108,8 @@ function SObjectTableSection({
         description={description}
         columns={tableColumns}
         data={filteredData}
-        pageSize={10}
+        pageSize={enablePagination ? 10 : 5}
+        showPageSizeSelector={enablePagination}
         isLoading={loading}
         getRowId={row => row.Id}
         emptyMessage={

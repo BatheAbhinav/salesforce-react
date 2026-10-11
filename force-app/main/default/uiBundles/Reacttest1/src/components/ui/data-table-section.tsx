@@ -33,6 +33,7 @@ export type DataTableSectionProps<T> = {
   data: T[];
   pageSize?: number;
   pageSizeOptions?: number[];
+  showPageSizeSelector?: boolean;
   getRowId: (row: T) => string | number;
   emptyMessage?: string;
   isLoading?: boolean;
@@ -52,6 +53,7 @@ function DataTableSection<T>({
   data,
   pageSize = 10,
   pageSizeOptions = [10, 25, 50],
+  showPageSizeSelector = true,
   getRowId,
   emptyMessage = 'No results.',
   isLoading = false,
@@ -82,24 +84,26 @@ function DataTableSection<T>({
           ) : null}
         </div>
 
-        <label className="flex items-center gap-2 text-sm text-muted-foreground">
-          Rows per page
-          <select
-            data-slot="data-table-limit"
-            className="h-8 rounded-md border border-input bg-background px-2 text-sm text-foreground"
-            value={limit}
-            onChange={(e) => {
-              setLimit(Number(e.target.value));
-              setPage(1);
-            }}
-          >
-            {pageSizeOptions.map((opt) => (
-              <option key={opt} value={opt}>
-                {opt}
-              </option>
-            ))}
-          </select>
-        </label>
+        {showPageSizeSelector ? (
+          <label className="flex items-center gap-2 text-sm text-muted-foreground">
+            Rows per page
+            <select
+              data-slot="data-table-limit"
+              className="h-8 rounded-md border border-input bg-background px-2 text-sm text-foreground"
+              value={limit}
+              onChange={(e) => {
+                setLimit(Number(e.target.value));
+                setPage(1);
+              }}
+            >
+              {pageSizeOptions.map((opt) => (
+                <option key={opt} value={opt}>
+                  {opt}
+                </option>
+              ))}
+            </select>
+          </label>
+        ) : null}
       </div>
 
       <Table aria-label={`${title} table`}>
