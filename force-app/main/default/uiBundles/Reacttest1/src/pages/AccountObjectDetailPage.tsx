@@ -1,21 +1,23 @@
-import { useState } from "react";
 import { useParams, useNavigate } from "react-router";
 import { createDataSDK } from "@salesforce/platform-sdk";
-import { AlertCircle, ChevronDown, ChevronRight, FileQuestion } from "lucide-react";
 import GET_ACCOUNT_DETAIL from "../api/account/query/getAccountDetail.graphql?raw";
-import { Alert, AlertTitle, AlertDescription } from "../components/ui/alert";
-import { Button } from "../components/ui/button";
 import { Card, CardContent } from "../components/ui/card";
-import { fieldValue, getAddressFieldLines, formatDateTimeField } from "../utils/accountFields";
-import {
-	Collapsible,
-	CollapsibleTrigger,
-	CollapsibleContent,
-} from "../components/ui/collapsible";
+import { fieldValue, getAddressFieldLines, formatDateTimeField } from "../utils/objectFields";
 import { Separator } from "../components/ui/separator";
 import { Skeleton } from "../components/ui/skeleton";
 import { useAsyncData } from "../hooks/useAsyncData";
 import { ObjectBreadcrumb } from "../components/ObjectBreadcrumb";
+import {
+	FieldItem,
+	FieldRow,
+	Section,
+	TelephoneField,
+	DetailError,
+	DetailNotFound,
+	DetailSkeleton,
+	SkeletonFieldRow,
+	SkeletonSection,
+} from "../components/ObjectDetail";
 
 /**
  * A uiapi scalar field as returned with `@optional { value displayValue }`.
@@ -109,10 +111,12 @@ export default function AccountObjectDetail() {
 			{loading && <AccountDetailSkeleton />}
 
 			{/* Error state */}
-			{error && <AccountDetailError onBack={() => navigate(-1)} />}
+			{error && <DetailError label="Account" onBack={() => navigate(-1)} />}
 
 			{/* Not found state */}
-			{!loading && !error && !account && <AccountDetailNotFound onBack={() => navigate(-1)} />}
+			{!loading && !error && !account && (
+				<DetailNotFound label="Account" onBack={() => navigate(-1)} />
+			)}
 
 			{/* Content */}
 			{account && <AccountDetailContent account={account} />}
@@ -232,163 +236,51 @@ function AccountDetailContent({ account }: { account: AccountNode }) {
 	);
 }
 
-function TelephoneField({ value }: { value?: string | null }) {
-	if (!value) return null;
-	return (
-		<a href={`tel:${value}`} className="underline">
-			{value}
-		</a>
-	);
-}
-
-function FieldItem({ label, children }: { label: string; children: React.ReactNode }) {
-	return (
-		<div>
-			<dt className="text-sm text-muted-foreground">{label}</dt>
-			<dd className="mt-0.5">{children ?? "—"}</dd>
-		</div>
-	);
-}
-
-function FieldRow({ children }: { children: React.ReactNode }) {
-	return <dl className="grid grid-cols-2 gap-x-8 gap-y-4">{children}</dl>;
-}
-
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
-	const [open, setOpen] = useState(true);
-	return (
-		<Collapsible open={open} onOpenChange={setOpen}>
-			<CollapsibleTrigger className="flex items-center gap-2 cursor-pointer text-lg font-semibold py-2">
-				{open ? <ChevronDown className="size-5" /> : <ChevronRight className="size-5" />}
-				{title}
-			</CollapsibleTrigger>
-			<CollapsibleContent>
-				<div className="mt-2 space-y-4">{children}</div>
-			</CollapsibleContent>
-		</Collapsible>
-	);
-}
-
-function AccountDetailError({ onBack }: { onBack: () => void }) {
-	return (
-		<>
-			<Alert variant="destructive" role="alert">
-				<AlertCircle />
-				<AlertTitle>
-					<h2>Failed to load account</h2>
-				</AlertTitle>
-				<AlertDescription>
-					Something went wrong while loading this account. Please try again later.
-				</AlertDescription>
-			</Alert>
-			<div className="mt-4 flex gap-3">
-				<Button variant="outline" onClick={onBack}>
-					← Back
-				</Button>
-				<Button variant="outline" onClick={() => window.location.reload()}>
-					Retry
-				</Button>
-			</div>
-		</>
-	);
-}
-
-function AccountDetailNotFound({ onBack }: { onBack: () => void }) {
-	return (
-		<Card>
-			<CardContent className="flex flex-col items-center justify-center py-16 text-center">
-				<FileQuestion className="size-12 text-muted-foreground mb-4" />
-				<h2 className="text-lg font-semibold mb-1">Account not found</h2>
-				<p className="text-sm text-muted-foreground mb-6">
-					The account you're looking for doesn't exist or may have been deleted.
-				</p>
-				<Button variant="outline" onClick={onBack}>
-					← Go back
-				</Button>
-			</CardContent>
-		</Card>
-	);
-}
-
 function AccountDetailSkeleton() {
 	return (
-		<>
-			<Skeleton className="h-8 w-56 mb-4" />
+		<DetailSkeleton>
+			{/* Top section: field rows */}
+			<div>
+				<div className="space-y-4">
+					<SkeletonFieldRow />
+					<SkeletonFieldRow />
+					<SkeletonFieldRow />
+				</div>
+			</div>
 
-			<Card>
-				<CardContent className="space-y-8 pt-6">
-					{/* Top section: field rows */}
+			<Separator />
+
+			{/* Additional Information */}
+			<SkeletonSection />
+
+			<Separator />
+
+			{/* Address Information */}
+			<div className="space-y-4">
+				<Skeleton className="h-7 w-48 py-2" />
+				<div className="grid grid-cols-2 gap-x-8 gap-y-4">
 					<div>
-						<div className="space-y-4">
-							<SkeletonFieldRow />
-							<SkeletonFieldRow />
-							<SkeletonFieldRow />
-						</div>
+						<Skeleton className="h-4 w-28 mb-1.5" />
+						<Skeleton className="h-5 w-44 mb-1" />
+						<Skeleton className="h-5 w-36 mb-1" />
+						<Skeleton className="h-5 w-28" />
 					</div>
-
-					<Separator />
-
-					{/* Additional Information */}
-					<SkeletonSection />
-
-					<Separator />
-
-					{/* Address Information */}
-					<div className="space-y-4">
-						<Skeleton className="h-7 w-48 py-2" />
-						<div className="grid grid-cols-2 gap-x-8 gap-y-4">
-							<div>
-								<Skeleton className="h-4 w-28 mb-1.5" />
-								<Skeleton className="h-5 w-44 mb-1" />
-								<Skeleton className="h-5 w-36 mb-1" />
-								<Skeleton className="h-5 w-28" />
-							</div>
-							<div>
-								<Skeleton className="h-4 w-32 mb-1.5" />
-								<Skeleton className="h-5 w-44 mb-1" />
-								<Skeleton className="h-5 w-36 mb-1" />
-								<Skeleton className="h-5 w-28" />
-							</div>
-						</div>
+					<div>
+						<Skeleton className="h-4 w-32 mb-1.5" />
+						<Skeleton className="h-5 w-44 mb-1" />
+						<Skeleton className="h-5 w-36 mb-1" />
+						<Skeleton className="h-5 w-28" />
 					</div>
+				</div>
+			</div>
 
-					<Separator />
+			<Separator />
 
-					{/* System Information */}
-					<div className="space-y-4">
-						<Skeleton className="h-7 w-48 py-2" />
-						<SkeletonFieldRow />
-					</div>
-				</CardContent>
-			</Card>
-		</>
-	);
-}
-
-function SkeletonField() {
-	return (
-		<div>
-			<Skeleton className="h-4 w-24 mb-1.5" />
-			<Skeleton className="h-5 w-40" />
-		</div>
-	);
-}
-
-function SkeletonFieldRow() {
-	return (
-		<div className="grid grid-cols-2 gap-x-8 gap-y-4">
-			<SkeletonField />
-			<SkeletonField />
-		</div>
-	);
-}
-
-function SkeletonSection() {
-	return (
-		<div className="space-y-4">
-			<Skeleton className="h-7 w-48 py-2" />
-			<SkeletonFieldRow />
-			<SkeletonFieldRow />
-		</div>
+			{/* System Information */}
+			<div className="space-y-4">
+				<Skeleton className="h-7 w-48 py-2" />
+				<SkeletonFieldRow />
+			</div>
+		</DetailSkeleton>
 	);
 }

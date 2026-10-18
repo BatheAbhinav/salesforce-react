@@ -60,6 +60,7 @@ function OpportunitySection({
       method="rest"
       enableSearch={enableSearch}
       enablePagination={enablePagination}
+      detailPath={row => `/opportunities/${row.Id}`}
     />
   );
 }

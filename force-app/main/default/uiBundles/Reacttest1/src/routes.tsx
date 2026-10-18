@@ -4,6 +4,8 @@ import Home from './pages/Home';
 import NotFound from './pages/NotFound';
 // import { Search as GlobalSearch, config } from "./features/search";
 import AccountObjectDetail from "./pages/AccountObjectDetailPage";
+import ContactObjectDetail from "./pages/ContactObjectDetailPage";
+import OpportunityObjectDetail from "./pages/OpportunityObjectDetailPage";
 import Properties from './pages/Properties';
 // import { useSearchParams } from 'react-router';
 
@@ -38,6 +40,14 @@ export const routes: RouteObject[] = [
       {
         path: "accounts/:recordId",
         element: <AccountObjectDetail />
+      },
+      {
+        path: "contacts/:recordId",
+        element: <ContactObjectDetail />
+      },
+      {
+        path: "opportunities/:recordId",
+        element: <OpportunityObjectDetail />
       },
       {
         path: "properties",

@@ -11,6 +11,7 @@ function ContactSection({enableSearch = true, enablePagination = true}) {
       method="rest"
       enableSearch={enableSearch}
       enablePagination={enablePagination}
+      detailPath={row => `/contacts/${row.Id}`}
     />
   );
 }

@@ -1,0 +1,77 @@
+query GetOpportunityDetail($id: ID!) {
+	uiapi {
+		query {
+			Opportunity(where: { Id: { eq: $id } }) {
+				edges {
+					node {
+						Id
+						Name @optional {
+							value
+							displayValue
+						}
+						Account @optional {
+							Name @optional {
+								value
+								displayValue
+							}
+						}
+						Owner @optional {
+							Name @optional {
+								value
+								displayValue
+							}
+						}
+						Amount @optional {
+							value
+							displayValue
+						}
+						StageName @optional {
+							value
+							displayValue
+						}
+						CloseDate @optional {
+							value
+							displayValue
+						}
+						Probability @optional {
+							value
+							displayValue
+						}
+						Type @optional {
+							value
+							displayValue
+						}
+						LeadSource @optional {
+							value
+							displayValue
+						}
+						Description @optional {
+							value
+							displayValue
+						}
+						CreatedBy @optional {
+							Name @optional {
+								value
+								displayValue
+							}
+						}
+						CreatedDate @optional {
+							value
+							displayValue
+						}
+						LastModifiedBy @optional {
+							Name @optional {
+								value
+								displayValue
+							}
+						}
+						LastModifiedDate @optional {
+							value
+							displayValue
+						}
+					}
+				}
+			}
+		}
+	}
+}

@@ -38,6 +38,7 @@ export type DataTableSectionProps<T> = {
   emptyMessage?: string;
   isLoading?: boolean;
   className?: string;
+  onRowClick?: (row: T) => void;
 };
 
 /**
@@ -58,6 +59,7 @@ function DataTableSection<T>({
   emptyMessage = 'No results.',
   isLoading = false,
   className,
+  onRowClick,
 }: DataTableSectionProps<T>) {
   const [page, setPage] = React.useState(1);
   const [limit, setLimit] = React.useState(pageSize);
@@ -128,7 +130,23 @@ function DataTableSection<T>({
             </TableRow>
           ) : rows.length > 0 ? (
             rows.map((row) => (
-              <TableRow key={getRowId(row)}>
+              <TableRow
+                key={getRowId(row)}
+                onClick={onRowClick ? () => onRowClick(row) : undefined}
+                onKeyDown={
+                  onRowClick
+                    ? (e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          onRowClick(row);
+                        }
+                      }
+                    : undefined
+                }
+                role={onRowClick ? 'button' : undefined}
+                tabIndex={onRowClick ? 0 : undefined}
+                className={onRowClick ? 'cursor-pointer' : undefined}
+              >
                 {columns.map((col) => (
                   <TableCell key={col.key} className={col.className}>
                     {col.cell(row)}

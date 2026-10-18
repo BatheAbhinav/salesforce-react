@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { Search } from 'lucide-react';
+import { useNavigate } from 'react-router';
 
 import { type SObjectField, type SObjectRecord } from '../../lib/types';
 import { querySObject } from '@/api/sobject/querySObject'; //fix import!!
@@ -26,6 +27,7 @@ export type SObjectTableSectionProps = {
   method: 'graphql' | 'rest';
   enableSearch?: boolean;
   enablePagination?: boolean;
+  detailPath?: (row: SObjectRecord) => string;
 };
 
 function toHeader(field: string): string {
@@ -44,7 +46,9 @@ function SObjectTableSection({
   method,
   enableSearch = true,
   enablePagination = true,
+  detailPath,
 }: SObjectTableSectionProps) {
+  const navigate = useNavigate();
   const { data, loading, error } = useAsyncData(
     () => querySObject({ object, fields, filters, orderBy, method }),
     [object, fields, filters, orderBy, method]
@@ -113,6 +117,7 @@ function SObjectTableSection({
         enablePagination={enablePagination}
         isLoading={loading}
         getRowId={row => row.Id}
+        onRowClick={detailPath ? row => navigate(detailPath(row)) : undefined}
         emptyMessage={
           searchTerm
             ? `No ${title.toLowerCase()} match “${searchTerm}”.`

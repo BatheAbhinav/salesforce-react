@@ -1,0 +1,89 @@
+query GetContactDetail($id: ID!) {
+	uiapi {
+		query {
+			Contact(where: { Id: { eq: $id } }) {
+				edges {
+					node {
+						Id
+						Name @optional {
+							value
+							displayValue
+						}
+						Title @optional {
+							value
+							displayValue
+						}
+						Email @optional {
+							value
+							displayValue
+						}
+						Phone @optional {
+							value
+							displayValue
+						}
+						MobilePhone @optional {
+							value
+							displayValue
+						}
+						Account @optional {
+							Name @optional {
+								value
+								displayValue
+							}
+						}
+						Owner @optional {
+							Name @optional {
+								value
+								displayValue
+							}
+						}
+						MailingStreet @optional {
+							value
+							displayValue
+						}
+						MailingCity @optional {
+							value
+							displayValue
+						}
+						MailingState @optional {
+							value
+							displayValue
+						}
+						MailingPostalCode @optional {
+							value
+							displayValue
+						}
+						MailingCountry @optional {
+							value
+							displayValue
+						}
+						Description @optional {
+							value
+							displayValue
+						}
+						CreatedBy @optional {
+							Name @optional {
+								value
+								displayValue
+							}
+						}
+						CreatedDate @optional {
+							value
+							displayValue
+						}
+						LastModifiedBy @optional {
+							Name @optional {
+								value
+								displayValue
+							}
+						}
+						LastModifiedDate @optional {
+							value
+							displayValue
+						}
+					}
+				}
+			}
+		}
+	}
+}

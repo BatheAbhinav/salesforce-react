@@ -1,7 +1,8 @@
 /**
- * Field helpers for reading uiapi GraphQL response nodes on the Account
- * detail page. Previously imported from feature-react-object-search; inlined
- * here so the app no longer depends on that feature.
+ * Field helpers for reading uiapi GraphQL response nodes on object detail
+ * pages (Account/Contact/Opportunity). Previously imported from
+ * feature-react-object-search; inlined here so the app no longer depends on
+ * that feature.
  */
 
 /** Picks the user-facing string for a `{ value, displayValue }` field. */

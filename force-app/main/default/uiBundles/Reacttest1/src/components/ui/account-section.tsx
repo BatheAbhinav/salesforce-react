@@ -14,6 +14,7 @@ function AccountSection({enableSearch = true, enablePagination = true}) {
       method="rest"
       enableSearch={enableSearch}
       enablePagination={enablePagination}
+      detailPath={row => `/accounts/${row.Id}`}
     />
   );
 }

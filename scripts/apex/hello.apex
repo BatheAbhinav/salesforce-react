@@ -1,1 +1,1 @@
-System.debug(ParkLocator.country('India'));
+System.debug(ContactController.getContacts());
