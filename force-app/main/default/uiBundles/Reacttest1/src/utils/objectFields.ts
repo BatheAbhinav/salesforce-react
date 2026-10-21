@@ -14,6 +14,18 @@ export function fieldValue(
 	return null;
 }
 
+/**
+ * Picks the raw underlying value for a `{ value, displayValue }` field —
+ * for prefilling edit forms, where a formatted `displayValue` (e.g.
+ * "$1,000,000.00") would round-trip badly through a number/date input.
+ */
+export function editableValue(
+	field: { displayValue?: string | null; value?: unknown } | null | undefined,
+): unknown {
+	if (field?.value != null) return field.value;
+	return field?.displayValue ?? null;
+}
+
 /** Builds the display lines for a Salesforce compound address, or null if empty. */
 export function getAddressFieldLines(address: {
 	street?: string | null;

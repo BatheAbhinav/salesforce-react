@@ -1,11 +1,15 @@
+import { useState } from "react";
 import { useParams, useNavigate } from "react-router";
 import { createDataSDK } from "@salesforce/platform-sdk";
 import GET_OPPORTUNITY_DETAIL from "../api/opportunity/query/getOpportunityDetail.graphql?raw";
+import { updateSObject } from "../api/sobject/querySObject";
+import { Button } from "../components/ui/button";
 import { Card, CardContent } from "../components/ui/card";
-import { fieldValue, formatDateTimeField } from "../utils/objectFields";
+import { fieldValue, editableValue, formatDateTimeField } from "../utils/objectFields";
 import { Separator } from "../components/ui/separator";
 import { useAsyncData } from "../hooks/useAsyncData";
 import { ObjectBreadcrumb } from "../components/ObjectBreadcrumb";
+import { EditRecordDialog, type EditableFieldConfig } from "../components/EditRecordDialog";
 import {
 	FieldItem,
 	FieldRow,
@@ -51,6 +55,13 @@ interface GetOpportunityDetailResponse {
 	} | null;
 }
 
+const OPPORTUNITY_EDIT_FIELDS: EditableFieldConfig[] = [
+	{ key: "Name", label: "Opportunity Name" },
+	{ key: "Amount", label: "Amount", type: "number" },
+	{ key: "StageName", label: "Stage" },
+	{ key: "CloseDate", label: "Close Date", type: "date" },
+];
+
 async function fetchOpportunityDetail(
 	recordId: string,
 ): Promise<OpportunityNode | null | undefined> {
@@ -70,12 +81,19 @@ async function fetchOpportunityDetail(
 export default function OpportunityObjectDetail() {
 	const { recordId } = useParams();
 	const navigate = useNavigate();
+	const [isEditOpen, setIsEditOpen] = useState(false);
 
 	const {
 		data: opportunity,
 		loading,
 		error,
+		refetch,
 	} = useAsyncData(() => fetchOpportunityDetail(recordId!), [recordId]);
+
+	async function handleSave(values: Record<string, unknown>) {
+		await updateSObject({ object: "Opportunity", id: recordId!, fields: values });
+		refetch();
+	}
 
 	return (
 		<div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
@@ -106,12 +124,38 @@ export default function OpportunityObjectDetail() {
 			)}
 
 			{/* Content */}
-			{opportunity && <OpportunityDetailContent opportunity={opportunity} />}
+			{opportunity && (
+				<>
+					<OpportunityDetailContent
+						opportunity={opportunity}
+						onEdit={() => setIsEditOpen(true)}
+					/>
+					<EditRecordDialog
+						open={isEditOpen}
+						onOpenChange={setIsEditOpen}
+						title="Edit Opportunity"
+						fields={OPPORTUNITY_EDIT_FIELDS}
+						values={Object.fromEntries(
+							OPPORTUNITY_EDIT_FIELDS.map((field) => [
+								field.key,
+								editableValue(opportunity[field.key as keyof OpportunityNode] as FieldValue),
+							]),
+						)}
+						onSubmit={handleSave}
+					/>
+				</>
+			)}
 		</div>
 	);
 }
 
-function OpportunityDetailContent({ opportunity }: { opportunity: OpportunityNode }) {
+function OpportunityDetailContent({
+	opportunity,
+	onEdit,
+}: {
+	opportunity: OpportunityNode;
+	onEdit: () => void;
+}) {
 	const dateTimeOptions = { dateStyle: "medium", timeStyle: "short" } as const;
 	const createdDate = formatDateTimeField(
 		fieldValue(opportunity.CreatedDate),
@@ -126,7 +170,12 @@ function OpportunityDetailContent({ opportunity }: { opportunity: OpportunityNod
 
 	return (
 		<>
-			<h1 className="text-2xl font-bold mb-4">Opportunity: {fieldValue(opportunity.Name)}</h1>
+			<div className="flex items-center justify-between mb-4">
+				<h1 className="text-2xl font-bold">Opportunity: {fieldValue(opportunity.Name)}</h1>
+				<Button variant="outline" onClick={onEdit}>
+					Edit
+				</Button>
+			</div>
 
 			<Card>
 				<CardContent className="space-y-8 pt-6">

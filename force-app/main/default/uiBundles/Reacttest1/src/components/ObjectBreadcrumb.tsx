@@ -1,13 +1,13 @@
-import { Link } from "react-router";
+import { Link } from 'react-router';
 import {
-	Breadcrumb,
-	BreadcrumbList,
-	BreadcrumbItem,
-	BreadcrumbLink,
-	BreadcrumbSeparator,
-	BreadcrumbPage,
-} from "./ui/breadcrumb";
-import { Skeleton } from "./ui/skeleton";
+  Breadcrumb,
+  BreadcrumbList,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbSeparator,
+  BreadcrumbPage,
+} from './ui/breadcrumb';
+import { Skeleton } from './ui/skeleton';
 
 /**
  * Home → List → Record breadcrumb for object pages. Previously imported from
@@ -15,57 +15,58 @@ import { Skeleton } from "./ui/skeleton";
  * that feature.
  */
 interface ObjectBreadcrumbProps {
-	listPath: string;
-	listLabel: string;
-	recordName?: string;
-	loading?: boolean;
-	includeHome?: boolean; // default is true
-	homeLabel?: string; // default is "Home"
+  listPath: string;
+  listLabel: string;
+  recordName?: string;
+  loading?: boolean;
+  includeHome?: boolean; // default is true
+  homeLabel?: string; // default is "Home"
 }
 
 export function ObjectBreadcrumb({
-	listPath,
-	listLabel,
-	recordName,
-	loading,
-	includeHome = true,
-	homeLabel = "Home",
+  listPath,
+  listLabel,
+  recordName,
+  loading,
+  includeHome = true,
+  homeLabel = 'Home',
 }: ObjectBreadcrumbProps) {
-	const isDetailView = loading || recordName;
+  const isDetailView = loading || recordName;
+  console.log(listPath);
 
-	return (
-		<Breadcrumb className="mb-3">
-			<BreadcrumbList>
-				{includeHome && (
-					<BreadcrumbItem>
-						<BreadcrumbLink asChild>
-							<Link to="/">{homeLabel}</Link>
-						</BreadcrumbLink>
-					</BreadcrumbItem>
-				)}
-				<BreadcrumbSeparator />
-				{isDetailView ? (
-					<>
-						<BreadcrumbItem>
-							<BreadcrumbLink asChild>
-								<Link to={listPath}>{listLabel}</Link>
-							</BreadcrumbLink>
-						</BreadcrumbItem>
-						<BreadcrumbSeparator />
-						<BreadcrumbItem>
-							{loading && !recordName ? (
-								<Skeleton className="h-4 w-32" />
-							) : (
-								<BreadcrumbPage>{recordName}</BreadcrumbPage>
-							)}
-						</BreadcrumbItem>
-					</>
-				) : (
-					<BreadcrumbItem>
-						<BreadcrumbPage>{listLabel}</BreadcrumbPage>
-					</BreadcrumbItem>
-				)}
-			</BreadcrumbList>
-		</Breadcrumb>
-	);
+  return (
+    <Breadcrumb className="mb-3">
+      <BreadcrumbList>
+        {includeHome && (
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <Link to="/">{homeLabel}</Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+        )}
+        <BreadcrumbSeparator />
+        {isDetailView ? (
+          <>
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild className="hover:cursor-default">
+                <Link to="/">{listLabel}</Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              {loading && !recordName ? (
+                <Skeleton className="h-4 w-32" />
+              ) : (
+                <BreadcrumbPage>{recordName}</BreadcrumbPage>
+              )}
+            </BreadcrumbItem>
+          </>
+        ) : (
+          <BreadcrumbItem>
+            <BreadcrumbPage>{listLabel}</BreadcrumbPage>
+          </BreadcrumbItem>
+        )}
+      </BreadcrumbList>
+    </Breadcrumb>
+  );
 }

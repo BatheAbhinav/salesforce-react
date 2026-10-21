@@ -77,6 +77,30 @@ export async function querySObject(
     .filter(record => record.Id.length > 0);
 }
 
+export type UpdateSObjectOptions = {
+  object: string;
+  id: string;
+  fields: Record<string, unknown>;
+};
+
+/** Updates a record via its Apex REST endpoint (`PATCH /services/apexrest/<objects>/<id>`). */
+export async function updateSObject(
+  options: UpdateSObjectOptions
+): Promise<SObjectRecord> {
+  assertIdentifier(options.object, 'object name');
+
+  const endpoint = `${pluralize(options.object.toLowerCase())}/${options.id}`;
+  const result = await apexClient.callApexMethod<Record<string, unknown>>(endpoint, {
+    method: 'PATCH',
+    body: options.fields,
+  });
+
+  return {
+    ...result.data,
+    Id: String(result.data.Id ?? options.id),
+  };
+}
+
 function normalizeRecord(
   node: Record<string, unknown>,
   fields: SObjectQueryOptions['fields']

@@ -1,11 +1,20 @@
+import { useState } from "react";
 import { useParams, useNavigate } from "react-router";
 import { createDataSDK } from "@salesforce/platform-sdk";
 import GET_CONTACT_DETAIL from "../api/contact/query/getContactDetail.graphql?raw";
+import { updateSObject } from "../api/sobject/querySObject";
+import { Button } from "../components/ui/button";
 import { Card, CardContent } from "../components/ui/card";
-import { fieldValue, getAddressFieldLines, formatDateTimeField } from "../utils/objectFields";
+import {
+	fieldValue,
+	editableValue,
+	getAddressFieldLines,
+	formatDateTimeField,
+} from "../utils/objectFields";
 import { Separator } from "../components/ui/separator";
 import { useAsyncData } from "../hooks/useAsyncData";
 import { ObjectBreadcrumb } from "../components/ObjectBreadcrumb";
+import { EditRecordDialog, type EditableFieldConfig } from "../components/EditRecordDialog";
 import {
 	FieldItem,
 	FieldRow,
@@ -27,6 +36,8 @@ type NameHolder = { Name?: FieldValue } | null;
 interface ContactNode {
 	Id?: string;
 	Name?: FieldValue;
+	FirstName?: FieldValue;
+	LastName?: FieldValue;
 	Title?: FieldValue;
 	Email?: FieldValue;
 	Phone?: FieldValue;
@@ -55,6 +66,14 @@ interface GetContactDetailResponse {
 	} | null;
 }
 
+const CONTACT_EDIT_FIELDS: EditableFieldConfig[] = [
+	{ key: "FirstName", label: "First Name" },
+	{ key: "LastName", label: "Last Name" },
+	{ key: "Title", label: "Title" },
+	{ key: "Email", label: "Email" },
+	{ key: "Phone", label: "Phone" },
+];
+
 async function fetchContactDetail(recordId: string): Promise<ContactNode | null | undefined> {
 	const data = await createDataSDK();
 	const result = await data.graphql!.query<GetContactDetailResponse, { id: string }>({
@@ -72,12 +91,19 @@ async function fetchContactDetail(recordId: string): Promise<ContactNode | null 
 export default function ContactObjectDetail() {
 	const { recordId } = useParams();
 	const navigate = useNavigate();
+	const [isEditOpen, setIsEditOpen] = useState(false);
 
 	const {
 		data: contact,
 		loading,
 		error,
+		refetch,
 	} = useAsyncData(() => fetchContactDetail(recordId!), [recordId]);
+
+	async function handleSave(values: Record<string, unknown>) {
+		await updateSObject({ object: "Contact", id: recordId!, fields: values });
+		refetch();
+	}
 
 	return (
 		<div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
@@ -108,12 +134,35 @@ export default function ContactObjectDetail() {
 			)}
 
 			{/* Content */}
-			{contact && <ContactDetailContent contact={contact} />}
+			{contact && (
+				<>
+					<ContactDetailContent contact={contact} onEdit={() => setIsEditOpen(true)} />
+					<EditRecordDialog
+						open={isEditOpen}
+						onOpenChange={setIsEditOpen}
+						title="Edit Contact"
+						fields={CONTACT_EDIT_FIELDS}
+						values={Object.fromEntries(
+							CONTACT_EDIT_FIELDS.map((field) => [
+								field.key,
+								editableValue(contact[field.key as keyof ContactNode] as FieldValue),
+							]),
+						)}
+						onSubmit={handleSave}
+					/>
+				</>
+			)}
 		</div>
 	);
 }
 
-function ContactDetailContent({ contact }: { contact: ContactNode }) {
+function ContactDetailContent({
+	contact,
+	onEdit,
+}: {
+	contact: ContactNode;
+	onEdit: () => void;
+}) {
 	const mailingAddress = getAddressFieldLines({
 		street: fieldValue(contact.MailingStreet),
 		city: fieldValue(contact.MailingCity),
@@ -136,7 +185,12 @@ function ContactDetailContent({ contact }: { contact: ContactNode }) {
 
 	return (
 		<>
-			<h1 className="text-2xl font-bold mb-4">Contact: {fieldValue(contact.Name)}</h1>
+			<div className="flex items-center justify-between mb-4">
+				<h1 className="text-2xl font-bold">Contact: {fieldValue(contact.Name)}</h1>
+				<Button variant="outline" onClick={onEdit}>
+					Edit
+				</Button>
+			</div>
 
 			<Card>
 				<CardContent className="space-y-8 pt-6">

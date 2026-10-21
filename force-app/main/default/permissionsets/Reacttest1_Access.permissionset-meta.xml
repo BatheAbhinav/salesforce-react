@@ -4,6 +4,10 @@
         <application>Reacttest1</application>
         <visible>true</visible>
     </applicationVisibilities>
+    <classAccesses>
+        <apexClass>EncryptedPayloadApi</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
     <hasActivationRequired>false</hasActivationRequired>
     <label>Reacttest1 Access</label>
     <userPermissions>

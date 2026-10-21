@@ -4,6 +4,7 @@ interface UseAsyncDataResult<T> {
   data: T | null;
   loading: boolean;
   error: string | null;
+  refetch: () => void;
 }
 
 /**
@@ -63,5 +64,7 @@ export function useAsyncData<T>(
     };
   }, [generation]);
 
-  return { data, loading, error };
+  const refetch = () => setGeneration(g => g + 1);
+
+  return { data, loading, error, refetch };
 }

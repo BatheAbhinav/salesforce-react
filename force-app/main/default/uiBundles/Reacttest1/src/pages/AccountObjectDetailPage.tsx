@@ -1,12 +1,21 @@
+import { useState } from "react";
 import { useParams, useNavigate } from "react-router";
 import { createDataSDK } from "@salesforce/platform-sdk";
 import GET_ACCOUNT_DETAIL from "../api/account/query/getAccountDetail.graphql?raw";
+import { updateSObject } from "../api/sobject/querySObject";
+import { Button } from "../components/ui/button";
 import { Card, CardContent } from "../components/ui/card";
-import { fieldValue, getAddressFieldLines, formatDateTimeField } from "../utils/objectFields";
+import {
+	fieldValue,
+	editableValue,
+	getAddressFieldLines,
+	formatDateTimeField,
+} from "../utils/objectFields";
 import { Separator } from "../components/ui/separator";
 import { Skeleton } from "../components/ui/skeleton";
 import { useAsyncData } from "../hooks/useAsyncData";
 import { ObjectBreadcrumb } from "../components/ObjectBreadcrumb";
+import { EditRecordDialog, type EditableFieldConfig } from "../components/EditRecordDialog";
 import {
 	FieldItem,
 	FieldRow,
@@ -66,6 +75,17 @@ interface GetAccountDetailResponse {
 	} | null;
 }
 
+const ACCOUNT_EDIT_FIELDS: EditableFieldConfig[] = [
+	{ key: "Name", label: "Account Name" },
+	{ key: "Phone", label: "Phone" },
+	{ key: "Website", label: "Website" },
+	{ key: "Industry", label: "Industry" },
+	{ key: "Type", label: "Type" },
+	{ key: "AnnualRevenue", label: "Annual Revenue", type: "number" },
+	{ key: "NumberOfEmployees", label: "Employees", type: "number" },
+	{ key: "Description", label: "Description" },
+];
+
 async function fetchAccountDetail(recordId: string): Promise<AccountNode | null | undefined> {
 	const data = await createDataSDK();
 	const result = await data.graphql!.query<GetAccountDetailResponse, { id: string }>({
@@ -83,12 +103,19 @@ async function fetchAccountDetail(recordId: string): Promise<AccountNode | null 
 export default function AccountObjectDetail() {
 	const { recordId } = useParams();
 	const navigate = useNavigate();
+	const [isEditOpen, setIsEditOpen] = useState(false);
 
 	const {
 		data: account,
 		loading,
 		error,
+		refetch,
 	} = useAsyncData(() => fetchAccountDetail(recordId!), [recordId]);
+
+	async function handleSave(values: Record<string, unknown>) {
+		await updateSObject({ object: "Account", id: recordId!, fields: values });
+		refetch();
+	}
 
 	return (
 		<div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
@@ -119,12 +146,35 @@ export default function AccountObjectDetail() {
 			)}
 
 			{/* Content */}
-			{account && <AccountDetailContent account={account} />}
+			{account && (
+				<>
+					<AccountDetailContent account={account} onEdit={() => setIsEditOpen(true)} />
+					<EditRecordDialog
+						open={isEditOpen}
+						onOpenChange={setIsEditOpen}
+						title="Edit Account"
+						fields={ACCOUNT_EDIT_FIELDS}
+						values={Object.fromEntries(
+							ACCOUNT_EDIT_FIELDS.map((field) => [
+								field.key,
+								editableValue(account[field.key as keyof AccountNode] as FieldValue),
+							]),
+						)}
+						onSubmit={handleSave}
+					/>
+				</>
+			)}
 		</div>
 	);
 }
 
-function AccountDetailContent({ account }: { account: AccountNode }) {
+function AccountDetailContent({
+	account,
+	onEdit,
+}: {
+	account: AccountNode;
+	onEdit: () => void;
+}) {
 	const billingAddress = getAddressFieldLines({
 		street: fieldValue(account.BillingStreet),
 		city: fieldValue(account.BillingCity),
@@ -155,7 +205,12 @@ function AccountDetailContent({ account }: { account: AccountNode }) {
 
 	return (
 		<>
-			<h1 className="text-2xl font-bold mb-4">Account: {fieldValue(account.Name)}</h1>
+			<div className="flex items-center justify-between mb-4">
+				<h1 className="text-2xl font-bold">Account: {fieldValue(account.Name)}</h1>
+				<Button variant="outline" onClick={onEdit}>
+					Edit
+				</Button>
+			</div>
 
 			<Card>
 				<CardContent className="space-y-8 pt-6">

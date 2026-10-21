@@ -39,9 +39,11 @@ export default function HomePage() {
           <AccountSection />
         </TabsContent>
         <TabsContent value="opportunities" className="mt-4">
-          <Button onClick={() => setDateFormat(toggleDateFormat)}>
-            Change date format
-          </Button>
+          <div className="flex justify-end mb-4">
+            <Button onClick={() => setDateFormat(toggleDateFormat)}>
+              Change date format
+            </Button>
+          </div>
           <OpportunitySection dateFormat={dateFormat} />
         </TabsContent>
         <TabsContent value="contacts" className="mt-4">

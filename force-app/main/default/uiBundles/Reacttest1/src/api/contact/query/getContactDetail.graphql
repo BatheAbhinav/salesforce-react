@@ -9,6 +9,14 @@ query GetContactDetail($id: ID!) {
 							value
 							displayValue
 						}
+						FirstName @optional {
+							value
+							displayValue
+						}
+						LastName @optional {
+							value
+							displayValue
+						}
 						Title @optional {
 							value
 							displayValue
