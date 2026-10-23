@@ -25,6 +25,8 @@ global with sharing class AccountApi {
     RestRequest req = RestContext.request;
     String recordId = req.requestURI.substringAfterLast('/');
 
+    System.debug(recordId);
+
     AccountUpdateInput input = (AccountUpdateInput) JSON.deserialize(
       req.requestBody.toString(),
       AccountUpdateInput.class
