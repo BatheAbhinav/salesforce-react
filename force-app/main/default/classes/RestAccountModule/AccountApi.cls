@@ -26,6 +26,7 @@ global with sharing class AccountApi {
     String recordId = req.requestURI.substringAfterLast('/');
 
     System.debug(recordId);
+    System.debug(recordId);
 
     AccountUpdateInput input = (AccountUpdateInput) JSON.deserialize(
       req.requestBody.toString(),
