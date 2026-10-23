@@ -1,4 +1,4 @@
-# React Internal App
+# React Internal App @Abhinav
 
 An internal React starter template for the Salesforce platform. Includes an Agentforce conversation client and global search; intended for internal (non-Experience Cloud) deployment. Built with React, Vite, TypeScript, and Tailwind/shadcn.
 
