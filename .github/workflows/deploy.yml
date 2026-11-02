@@ -1,0 +1,47 @@
+name: Deploy to Salesforce
+
+on:
+  push:
+    branches: [dev, uat, prod]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - run: npm ci
+
+      - run: npm run lint
+
+      - run: npm run test:unit
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    # Maps to a GitHub Environment named "dev" / "uat" / "prod" — each holds
+    # its own SFDX_AUTH_URL secret (and prod can require manual approval).
+    environment: ${{ github.ref_name }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Salesforce CLI
+        run: npm install --global @salesforce/cli
+
+      - name: Authenticate to target org
+        run: |
+          echo "${{ secrets.SFDX_AUTH_URL }}" > ./SFDX_AUTH_URL.txt
+          sf org login sfdx-url --sfdx-url-file ./SFDX_AUTH_URL.txt --alias target-org --set-default
+          rm ./SFDX_AUTH_URL.txt
+
+      - name: Deploy source
+        run: |
+          sf project deploy start \
+            --source-dir force-app \
+            --target-org target-org \
+            --wait 30 \
+            --test-level ${{ vars.TEST_LEVEL || 'NoTestRun' }}

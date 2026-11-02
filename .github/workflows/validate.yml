@@ -1,0 +1,49 @@
+name: Validate Pull Request
+
+on:
+  pull_request:
+    branches: [dev, uat, prod]
+    types: [opened, synchronize, reopened]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - run: npm ci
+
+      - run: npm run lint
+
+      - run: npm run test:unit
+
+  validate-deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    # Uses the SFDX_AUTH_URL of the PR's *target* environment, so a PR into
+    # prod is check-only validated against the prod org, etc.
+    environment: ${{ github.base_ref }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Salesforce CLI
+        run: npm install --global @salesforce/cli
+
+      - name: Authenticate to target org
+        run: |
+          echo "${{ secrets.SFDX_AUTH_URL }}" > ./SFDX_AUTH_URL.txt
+          sf org login sfdx-url --sfdx-url-file ./SFDX_AUTH_URL.txt --alias target-org --set-default
+          rm ./SFDX_AUTH_URL.txt
+
+      - name: Dry-run deploy (check only)
+        run: |
+          sf project deploy start \
+            --dry-run \
+            --source-dir force-app \
+            --target-org target-org \
+            --wait 30 \
+            --test-level ${{ vars.TEST_LEVEL || 'NoTestRun' }}
