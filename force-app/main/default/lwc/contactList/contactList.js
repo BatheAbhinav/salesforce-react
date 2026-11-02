@@ -3,7 +3,7 @@ import getContacts from "@salesforce/apex/ContactController.getContacts";
 import FIRSTNAME_FIELD from "@salesforce/schema/Contact.FirstName";
 import LASTNAME_FIELD from "@salesforce/schema/Contact.LastName";
 import EMAIL_FIELD from "@salesforce/schema/Contact.Email";
-import { reduceErrors } from 'c/ldsUtils';
+import { reduceErrors } from "c/ldsUtils";
 
 const COLUMNS = [
   { label: "FirstName", fieldName: FIRSTNAME_FIELD.fieldApiName },
@@ -16,7 +16,7 @@ export default class ContactList extends LightningElement {
   @wire(getContacts)
   contacts;
 
-  get errors(){
+  get errors() {
     return this.contacts.errors ? reduceErrors(this.contacts.errors) : [];
   }
 }

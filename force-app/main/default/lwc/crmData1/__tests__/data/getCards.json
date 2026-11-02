@@ -1,0 +1,24 @@
+[
+    {
+        "recordId": "001000000000001AAA",
+        "title": "Acme Corp",
+        "fields": [
+            { "label": "Industry", "value": "Technology" },
+            { "label": "Type", "value": "Customer" },
+            { "label": "Annual Revenue", "value": "1,000,000" },
+            { "label": "Employees", "value": "50" },
+            { "label": "Billing City", "value": "San Francisco" }
+        ]
+    },
+    {
+        "recordId": "001000000000002AAA",
+        "title": "Globex",
+        "fields": [
+            { "label": "Industry", "value": "Manufacturing" },
+            { "label": "Type", "value": "Prospect" },
+            { "label": "Annual Revenue", "value": "500,000" },
+            { "label": "Employees", "value": "20" },
+            { "label": "Billing City", "value": "Austin" }
+        ]
+    }
+]

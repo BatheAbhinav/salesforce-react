@@ -101,37 +101,65 @@ global with sharing class EncryptedPayloadApi {
     );
   }
 
-  private static Object dispatch(String method, String path) {
-    if (method == 'GET') {
-      if (path == '/services/apexrest/accounts')
-        return AccountApi.getAccounts();
-      if (path == '/services/apexrest/contacts')
-        return ContactApi.getContacts();
-      if (path == '/services/apexrest/opportunities')
-        return OpportunityApi.getOpportunities();
+  private interface ResourceHandler {
+    Object fetchList();
+    Object applyUpdate();
+  }
+
+  private class AccountHandler implements ResourceHandler {
+    public Object fetchList() {
+      return AccountApi.getAccounts();
     }
-    if (method == 'PATCH') {
-      if (
-        Pattern.matches(
-          '^/services/apexrest/accounts/[a-zA-Z0-9]{15,18}$',
-          path
-        )
-      )
-        return AccountApi.updateAccount();
-      if (
-        Pattern.matches(
-          '^/services/apexrest/contacts/[a-zA-Z0-9]{15,18}$',
-          path
-        )
-      )
-        return ContactApi.updateContact();
-      if (
-        Pattern.matches(
-          '^/services/apexrest/opportunities/[a-zA-Z0-9]{15,18}$',
-          path
-        )
-      )
-        return OpportunityApi.updateOpportunity();
+    public Object applyUpdate() {
+      return AccountApi.updateAccount();
+    }
+  }
+
+  private class ContactHandler implements ResourceHandler {
+    public Object fetchList() {
+      return ContactApi.getContacts();
+    }
+    public Object applyUpdate() {
+      return ContactApi.updateContact();
+    }
+  }
+
+  private class OpportunityHandler implements ResourceHandler {
+    public Object fetchList() {
+      return OpportunityApi.getOpportunities();
+    }
+    public Object applyUpdate() {
+      return OpportunityApi.updateOpportunity();
+    }
+  }
+
+  private static final Map<String, ResourceHandler> ROUTES = new Map<String, ResourceHandler>{
+    'accounts' => new AccountHandler(),
+    'contacts' => new ContactHandler(),
+    'opportunities' => new OpportunityHandler()
+  };
+
+  private static final Pattern ROUTE_PATTERN = Pattern.compile(
+    '^/services/apexrest/([a-zA-Z0-9]+)(?:/([a-zA-Z0-9]{15,18}))?$'
+  );
+
+  private static Object dispatch(String method, String path) {
+    Matcher routeMatch = ROUTE_PATTERN.matcher(path);
+    if (!routeMatch.matches()) {
+      throw new RejectedException('Unsupported route.');
+    }
+
+    ResourceHandler handler = ROUTES.get(routeMatch.group(1));
+    String recordId = routeMatch.group(2);
+    if (handler == null) {
+      throw new RejectedException('Unsupported route.');
+    }
+
+    if (method == 'GET' && recordId == null) {
+      return handler.fetchList();
+    }
+    if (method == 'PATCH' && recordId != null) {
+      return handler.applyUpdate();
     }
     throw new RejectedException('Unsupported route.');
   }
